@@ -1,0 +1,14 @@
+﻿<!DOCTYPE html>
+<html ng-app="app">
+<head>
+    <title>App</title>
+    <meta charset="utf-8"/>
+    <script src="//cdn.jsdelivr.net/angularjs/1.4.2/angular.min.js"></script>
+    <script src="scripts/app.js"></script>
+</head>
+<body ng-controller="ctrlBooks">
+<book-view ng-repeat="text in books" scope-model="text"></book-view>
+
+<book-view scope-model="other"></book-view>
+</body>
+</html>
