@@ -78,6 +78,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="db.json" />
     <None Include="packages.config" />
     <None Include="Resources\app.jsx" />
   </ItemGroup>
