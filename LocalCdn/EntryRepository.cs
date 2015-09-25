@@ -18,15 +18,7 @@ namespace LocalCdn
     public static class EntryRepository
     {
         private static readonly List<Entry> Entries = new List<Entry>();
-
-        static EntryRepository()
-        {
-#if DEBUG
-            Add(new Entry {Name = "Test", Url = "http://localhost/app.js"});
-            Add(new Entry {Name = "Jquery", Url = "http://localhost/jquery.js"});
-#endif
-        }
-
+        
         public static void Add(Entry entry)
         {
             Entries.Add(entry);

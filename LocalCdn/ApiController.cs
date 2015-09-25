@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 using Unosquare.Labs.EmbedIO;
 using Unosquare.Labs.EmbedIO.Modules;
 
@@ -21,7 +19,7 @@ namespace LocalCdn
                 var lastSegment = context.Request.Url.Segments.Last();
 
                 if (lastSegment.EndsWith("/"))
-                    return context.JsonResponse(data);
+                    return context.JsonResponse(data.Select(x => x.Name));
 
                 if (data.Any(p => p.Name == lastSegment))
                 {
@@ -36,13 +34,28 @@ namespace LocalCdn
             }
         }
 
-        [WebApiHandler(HttpVerbs.Post, "/api/entries/*")]
+        [WebApiHandler(HttpVerbs.Get, "/api/hosts/*")]
+        public bool GetHosts(WebServer server, HttpListenerContext context)
+        {
+            try
+            {
+                var data = LocalCdn.HostEntries;
+
+                return context.JsonResponse(data);
+            }
+            catch (Exception ex)
+            {
+                return HandleError(context, ex);
+            }
+        }
+
+        [WebApiHandler(HttpVerbs.Post, "/api/entries")]
         public bool Post(WebServer server, HttpListenerContext context)
         {
             try
             {
                 var model = context.ParseJson<Entry>();
-                EntryRepository.Add(model);
+                LocalCdn.AddEntry(model.Url);
 
                 return true;
             }
@@ -52,13 +65,13 @@ namespace LocalCdn
             }
         }
 
-        [WebApiHandler(HttpVerbs.Post, "/api/entries/*")]
+        [WebApiHandler(HttpVerbs.Delete, "/api/entries")]
         public bool Delete(WebServer server, HttpListenerContext context)
         {
             try
             {
                 var model = context.ParseJson<Entry>();
-
+                // TODO: Complete
                 return true;
             }
             catch (Exception ex)
