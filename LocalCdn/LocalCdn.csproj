@@ -80,7 +80,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="db.json" />
+    <None Include="db.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="packages.config" />
     <None Include="Resources\app.jsx" />
   </ItemGroup>

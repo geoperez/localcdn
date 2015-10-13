@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using Newtonsoft.Json;
 using Unosquare.Labs.EmbedIO;
 using Unosquare.Labs.EmbedIO.Log;
 using Unosquare.Labs.EmbedIO.Modules;
@@ -14,6 +15,8 @@ namespace LocalCdn
     {
         private static readonly string HostFile = Path.Combine(Environment.SystemDirectory, "drivers", "etc", "hosts");
         private static readonly string TmpFolder = Path.Combine(Path.GetTempPath(), "localcdn");
+        private static readonly string DbFile = "db.json";
+
         public static readonly List<string> HostEntries = new List<string>();
         private static readonly string OriginalHostFile;
         private static WebServer _server;
@@ -40,6 +43,38 @@ namespace LocalCdn
                     .Select(x => x.Split('\t'))
                     .Where(x => x.Length == 2)
                     .Select(x => x[1]).ToList());
+
+            if (File.Exists(DbFile)) ParseLocalFile();
+        }
+
+        private static void ParseLocalFile()
+        {
+            var content = JsonConvert.DeserializeObject<EntryCollection>(File.ReadAllText(DbFile));
+
+            if (content?.Entries == null || content.Entries.Count == 0) return;
+
+            foreach (var c in content.Entries)
+            {
+                Console.WriteLine($"Checking {c.Name}");
+
+                if (File.Exists(Path.Combine(TmpFolder, c.Name)) == false)
+                {
+                    AddEntry(c.Url);
+                }
+                else
+                {
+                    var url = new Uri(c.Url);
+
+                    if (HostEntries.Contains(url.Host) == false)
+                    {
+                        HostEntries.Add(url.Host);
+                    }
+
+                    ReapplyAll();
+
+                    EntryRepository.Add(new Entry { Name = c.Name, Url = url.ToString() });
+                }
+            }
         }
 
         public static void RunServer()
@@ -63,13 +98,7 @@ namespace LocalCdn
                         Resources.react_with_addons_min);
 
                     _server.RunAsync();
-
-#if DEBUG
-                    AddEntry(
-                        "http://cdnjs.cloudflare.com/ajax/libs/angular-local-storage/0.1.5/angular-local-storage.min.js");
-                    AddEntry("http://cdn.jsdelivr.net/bootstrap/latest/css/bootstrap.min.css");
-                    AddEntry("http://cdn.jsdelivr.net/fontawesome/latest/css/font-awesome.min.css");
-#endif
+                    
                     while (true)
                     {
                         Console.WriteLine("Type an Url to add or press Enter to stop...");
@@ -97,7 +126,7 @@ namespace LocalCdn
         {
             try
             {
-                _server.Log.InfoFormat("New file: {0}", result);
+                Console.WriteLine($"New file: {result}");
 
                 var url = new Uri(result);
                 var host = url.Host;
@@ -124,7 +153,9 @@ namespace LocalCdn
             }
             catch (Exception ex)
             {
-                _server.Log.Error(ex.Message);
+                Console.BackgroundColor = ConsoleColor.Red;
+                Console.WriteLine(ex.Message);
+                Console.BackgroundColor = ConsoleColor.Black;
             }
         }
 
