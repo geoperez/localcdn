@@ -1,6 +1,10 @@
 ﻿{
   "entries": [
     {
+      "name": "bootswatch/3.3.5/darkly/bootstrap.min.css",
+      "url": "http://maxcdn.bootstrapcdn.com/bootswatch/3.3.5/darkly/bootstrap.min.css"
+    },
+    {
       "name": "bootstrap/latest/css/bootstrap.min.css",
       "url": "http://cdn.jsdelivr.net/bootstrap/latest/css/bootstrap.min.css"
     },

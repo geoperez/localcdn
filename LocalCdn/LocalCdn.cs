@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using Unosquare.Labs.EmbedIO;
 using Unosquare.Labs.EmbedIO.Log;
@@ -16,6 +17,9 @@ namespace LocalCdn
         private static readonly string HostFile = Path.Combine(Environment.SystemDirectory, "drivers", "etc", "hosts");
         private static readonly string TmpFolder = Path.Combine(Path.GetTempPath(), "localcdn");
         private static readonly string DbFile = "db.json";
+
+        private static readonly Regex cssUrl =
+            new Regex(@"@import ([""'])(?<url>[^""']+)\1|url\(([""']?)(?<url>[^""')]+)\2\)", RegexOptions.IgnoreCase);
 
         public static readonly List<string> HostEntries = new List<string>();
         private static readonly string OriginalHostFile;
@@ -133,15 +137,14 @@ namespace LocalCdn
                 var webClient = new WebClient();
                 var filePath = url.AbsolutePath.Substring(1, url.AbsolutePath.Length - 1).Replace("/", "\\");
                 var path = Path.Combine(TmpFolder, filePath);
+                var directoryPath = path.Substring(0, path.LastIndexOf('\\'));
 
-                Directory.CreateDirectory(path.Substring(0, path.LastIndexOf('\\')));
+                Directory.CreateDirectory(directoryPath);
 
                 VerifyDomain(host);
 
                 Retry.Do(() => webClient.DownloadFile(url, path), TimeSpan.FromSeconds(5));
-
-                // TODO: If CSS parse IMPORTS
-
+                
                 if (HostEntries.Contains(host) == false)
                 {
                     HostEntries.Add(host);
@@ -150,6 +153,28 @@ namespace LocalCdn
                 ReapplyAll();
 
                 EntryRepository.Add(new Entry {Name = filePath, Url = url.ToString()});
+
+                if (result.EndsWith(".css"))
+                {
+                    var contentFile = File.ReadAllText(path);
+
+                    foreach (Match item in cssUrl.Matches(contentFile))
+                    {
+                        var value = item.Groups[3].Value;
+
+                        if (string.IsNullOrWhiteSpace(value)) continue;
+
+                        Console.WriteLine($"New CSS Import {value}");
+
+                        if (value.StartsWith("."))
+                        {
+                            value = url.ToString().Substring(0, url.ToString().LastIndexOf("/")) + "/" + value;
+                            Console.WriteLine($"New CSS Import {value}");
+                        }
+
+                        AddEntry(value);
+                    }
+                }
             }
             catch (Exception ex)
             {
