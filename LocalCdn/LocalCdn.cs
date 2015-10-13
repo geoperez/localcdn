@@ -88,6 +88,7 @@ namespace LocalCdn
                 using (_server = new WebServer("http://*:80/", new SimpleConsoleLog()))
                 {
                     _server.WithWebApiController<ApiController>();
+                    _server.RegisterModule(new CorsModule());
                     _server.RegisterModule(new StaticFilesModule(TmpFolder));
 
                     _server.Module<StaticFilesModule>().UseRamCache = true;
@@ -154,7 +155,7 @@ namespace LocalCdn
 
                 EntryRepository.Add(new Entry {Name = filePath, Url = url.ToString()});
 
-                if (result.EndsWith(".css"))
+                if (filePath.EndsWith("css"))
                 {
                     var contentFile = File.ReadAllText(path);
 
@@ -162,7 +163,7 @@ namespace LocalCdn
                     {
                         var value = item.Groups[3].Value;
 
-                        if (string.IsNullOrWhiteSpace(value)) continue;
+                        if (string.IsNullOrWhiteSpace(value) || value.StartsWith("data:")) continue;
 
                         Console.WriteLine($"New CSS Import {value}");
 
