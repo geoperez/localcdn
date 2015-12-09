@@ -21,8 +21,16 @@
       "url": "http://cdn.jsdelivr.net/toastr/2.0.1/toastr.css"
     },
     {
-      "name": "g/jquery,bootstrap,angularjs(angular.min.js+angular-animate.min.js+angular-route.min.js),angular.bootstrap(ui-bootstrap.min.js+ui-bootstrap-tpls.min.js),blob.js(Blob.js),filesaver.js,toastr,chart.js@1.0.1",
-      "url": "http://cdn.jsdelivr.net/g/jquery,bootstrap,angularjs(angular.min.js+angular-animate.min.js+angular-route.min.js),angular.bootstrap(ui-bootstrap.min.js+ui-bootstrap-tpls.min.js),blob.js(Blob.js),filesaver.js,toastr,chart.js@1.0.1"
+      "name": "g/jquery,bootstrap,angularjs(angular.min.js+angular-animate.min.js+angular-route.min.js),angular.bootstrap(ui-bootstrap.min.js+ui-bootstrap-tpls.min.js),blob.js(Blob.js),filesaver.js,toastr",
+      "url": "http://cdn.jsdelivr.net/g/jquery@2.1.4,bootstrap,angularjs(angular.min.js+angular-animate.min.js+angular-route.min.js),angular.bootstrap(ui-bootstrap.min.js+ui-bootstrap-tpls.min.js),blob.js(Blob.js),filesaver.js,toastr"
+    },
+    {
+      "name": "g/chart.js@1.0.1",
+      "url": "http://cdn.jsdelivr.net/g/chart.js@1.0.1"
+    },
+    {
+      "name": "g/highcharts",
+      "url": "http://cdn.jsdelivr.net/g/highcharts"
     },
     {
       "name": "ajax/libs/angular-local-storage/0.1.5/angular-local-storage.min.js",
